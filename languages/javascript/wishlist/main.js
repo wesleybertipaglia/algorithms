@@ -1,7 +1,8 @@
 const Auth = require("./model/Auth");
+const auth = new Auth();
 
 function main() {
-    Auth.getOption();
+    auth.getOption();
 }
 
 main();

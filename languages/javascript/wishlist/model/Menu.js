@@ -1,50 +1,47 @@
-const ReadLine = require("./ReadLine");
-
 class Menu {
-    constructor(options, switchOption) {
+    constructor(options) {
         this.options = options;
-        this.switchOption = switchOption;
-        this.ReadLine = ReadLine;
+        this.readLine = require("./ReadLine");
     }
 
-    getOption(notAvailable, repeat) {
+    getOption(notAvailable, repeat, callback) {
         if (notAvailable) {
-            console.log("\n\nThis option is not available, please chose another option.\n\n");
+            console.log("\n\nThis option is not available, please choose another option.\n\n");
         }
 
         if (repeat) {
             console.log("\n");
         }
 
-        this.ReadLine.question(`Available Options: ${this.options.map(option => `\n - ${option} [${this.options.indexOf(option)}]`).join('')}\n Chose an option: `, (option) => {
-            this.switchOption(option);
+        this.readLine.question(`Available Options: ${this.options.map(option => `\n - ${option} [${this.options.indexOf(option)}]`).join('')}\n Choose an option: `, (option) => {
+            callback(option);
         });
     }
 
     stopOrContinue(notAvailable) {
         if (notAvailable) {
-            console.log("\n\nThis option is not available, please chose another option.\n\n");
+            console.log("\n\nThis option is not available, please choose another option.\n\n");
         }
 
-        this.ReadLine.question('Do you want to stop or continue?\n - Chose another option [1]\n - Exit [2]\n Chose an option: ', (option) => {
-            switchStopOrContinue(option);
+        this.readLine.question('Do you want to stop or continue?\n - Choose another option [1]\n - Exit [2]\n Choose an option: ', (option) => {
+            this.switchStopOrContinue(option);
         });
     }
 
     switchStopOrContinue(option) {
         switch (option) {
             case "1":
-                takeOption(false, true);
+                this.getOption(false, true);
                 break;
 
             case "2":
                 process.exit(0);
-                break;
 
             default:
-                stopOrContinue(true);
+                this.stopOrContinue(true);
                 break;
         }
     }
 }
+
 module.exports = Menu;
