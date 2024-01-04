@@ -9,7 +9,7 @@ class Auth {
     constructor() {
         this.menu = new Menu(["Sign-in", "Sign-up", "Log-out"]);
         this.readLine = require("./ReadLine");
-        this.user = "";
+        this.session = { user: "" };
     }
 
     getOption(notAvailable, repeat) {
@@ -47,19 +47,9 @@ class Auth {
 
             this.readLine.question(`Password: `, (password) => {
                 credentials.password = password;
-
-                if (credentials != null) {
-                    const user = users.find(
-                        (u) => u.email === credentials.emailUsername || u.username === credentials.emailUsername
-                    );
-
-                    if (user && user.password === credentials.password) {
-                        console.log(`You are in, ${credentials.emailUsername}`);
-                    } else {
-                        console.log("Invalid credentials. Please try again.");
-                    }
-                }
+                this.verifyCredentials(credentials);
             });
+            this.readLine.close();
         });
     }
 
@@ -81,7 +71,9 @@ class Auth {
                     existingUsers.push(newUser);
                     fs.writeFileSync(usersFilePath, JSON.stringify(existingUsers, null, 2), "utf-8");
 
+                    this.session.user = credentials.username;
                     console.log(`User ${credentials.username} created successfully.`);
+                    return this.session;
                 });
             });
         });
@@ -89,7 +81,24 @@ class Auth {
 
     logout() {
         console.log("Log-out");
-        this.user = "";
+        this.session = { user: "" };
+    }
+
+    verifyCredentials(credentials) {
+        if (credentials != null) {
+            const user = users.find(
+                (u) => u.email === credentials.emailUsername || u.username === credentials.emailUsername
+            );
+
+            if (user && user.password === credentials.password) {
+                this.session.user = credentials.emailUsername;
+                console.log(`You are in, ${credentials.emailUsername}`);
+                return this.session;
+            } else {
+                console.log("Invalid credentials. Please try again.");
+                return false;
+            }
+        }
     }
 }
 
